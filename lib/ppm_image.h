@@ -14,6 +14,9 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <cstdint>
 
 namespace hxtk {
 
@@ -22,7 +25,7 @@ struct PpmData {
   int width;
   int height;
   int max;
-  std::vector<std::vector<int>> pixels_;
+  std::vector<uint8_t> pixels;
 };
 
 class PpmImage{
@@ -34,6 +37,8 @@ class PpmImage{
   inline get_height() { return data_.height; }
  private:
   void init(const std::ifstream &);
+  void init_ascii(const std::ifstream &);
+  void init_byte(const std::ifstream &);
 
   PpmData data_;  
 };  // class PpmImage

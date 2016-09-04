@@ -1,0 +1,11 @@
+#ifndef LIB_PPM_IMAGE_H
+#define LIB_PPM_IMAGE_H
+
+namespace hxtk {
+class PpmImage{
+
+};
+  
+}
+
+#endif // LIB_PPM_IMAGE_H
