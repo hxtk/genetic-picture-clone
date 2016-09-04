@@ -13,9 +13,9 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
-#include <cstdint>
 
 namespace hxtk {
 

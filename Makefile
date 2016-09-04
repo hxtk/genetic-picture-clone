@@ -4,7 +4,9 @@ OBJ = obj
 LIB = lib
 BUILD = build
 
-$(BUILD)/match: $(OBJ)/main.o $(OBJ)/ppm_image.o
+all: $(BUILD)/match
+
+$(BUILD)/match: $(OBJ)/main.o $(OBJ)/ppm_image.o $(OBJ)/graphics.o
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
 $(OBJ)/main.o: main.h main.cc
@@ -13,7 +15,10 @@ $(OBJ)/main.o: main.h main.cc
 $(OBJ)/ppm_image.o: $(LIB)/ppm_image.h
 	$(CPP) $(CPPFLAGS) -o $@ -c src/ppm_image.cc
 
-.PHONY: clean
+$(OBJ)/graphics.o: $(LIB)/graphics.h $(OBJ)/ppm_image.o
+	$(CPP) $(CPPFLAGS) -o $@ -c src/graphics.cc
+
+.PHONY: clean all
 
 clean:
 	rm $(OBJ)/*.o $(BUILD)/*
