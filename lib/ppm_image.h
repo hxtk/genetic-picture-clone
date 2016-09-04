@@ -19,14 +19,6 @@
 
 namespace hxtk {
 
-struct PpmData {
-  std::string ppm_version;
-  int width;
-  int height;
-  int num_levels;
-  std::vector<uint8_t> pixels;
-};
-
 class PpmImage{
  public:
   explicit PpmImage(std::ifstream &);
@@ -39,7 +31,14 @@ class PpmImage{
   void init_ascii(std::ifstream &);
   void init_byte(std::ifstream &);
 
-  PpmData data_;
+  struct PpmData {
+    std::string ppm_version;
+    int width;
+    int height;
+    int num_levels;
+    std::vector<uint8_t> pixels;
+  } data_;
+
 };  // class PpmImage
 }  // namespace hxtk
 
