@@ -13,5 +13,6 @@
 #include <cstdlib>
 
 #include "lib/ppm_image.h"
+#include "lib/graphics.h"
 
 #endif  // MAIN_H_

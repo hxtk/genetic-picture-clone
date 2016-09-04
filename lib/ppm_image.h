@@ -13,31 +13,42 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
-#include <cstdint>
+#include <iomanip>
 
 namespace hxtk {
-
+namespace ppm {
+struct PpmData {
+  std::string ppm_version;
+  int width;
+  int height;
+  int num_levels;
+  std::vector<uint8_t> pixels;
+};
+}  // namespace ppm
+ 
 class PpmImage{
  public:
-  explicit PpmImage(std::ifstream &);
+  explicit PpmImage(std::istream &);
+  explicit PpmImage(ppm::PpmData &);
   ~PpmImage();
+
+  void write(std::ostream &);
+  void convert(std::string);
 
   inline int get_width() { return data_.width; }
   inline int get_height() { return data_.height; }
  private:
-  void init(std::ifstream &);
-  void init_ascii(std::ifstream &);
-  void init_byte(std::ifstream &);
+  void writeByteBody(std::ostream &);
+  void writeAsciiBody(std::ostream &);
+  void init_stream(std::istream &);
+  void init_ascii_stream(std::istream &);
+  void init_byte_stream(std::istream &);
+  void init_struct(ppm::PpmData &);
 
-  struct PpmData {
-    std::string ppm_version;
-    int width;
-    int height;
-    int num_levels;
-    std::vector<uint8_t> pixels;
-  } data_;
+  ppm::PpmData data_;
 
 };  // class PpmImage
 }  // namespace hxtk
