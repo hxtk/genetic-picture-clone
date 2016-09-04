@@ -21,15 +21,17 @@ namespace hxtk {
 
 class PpmImage{
  public:
-  explicit PpmImage(std::ifstream &);
+  explicit PpmImage(std::istream &);
   ~PpmImage();
+
+  void write(std::ostream &);
 
   inline int get_width() { return data_.width; }
   inline int get_height() { return data_.height; }
  private:
-  void init(std::ifstream &);
-  void init_ascii(std::ifstream &);
-  void init_byte(std::ifstream &);
+  void init(std::istream &);
+  void init_ascii(std::istream &);
+  void init_byte(std::istream &);
 
   struct PpmData {
     std::string ppm_version;

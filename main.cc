@@ -15,6 +15,7 @@ int main(int argc, char ** argv) {
   }
   std::ifstream input_file(argv[1], std::ifstream::in);
   hxtk::PpmImage *input_image = new hxtk::PpmImage(input_file);
+  input_file.close();
 
   delete input_image;
   return 0;

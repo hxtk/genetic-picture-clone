@@ -9,36 +9,40 @@
 
 namespace hxtk {
 
+void PpmImage::write(std::ostream & output_stream) {
+  output_stream << data_.ppm_version << "\n"
+		<< data_.width << " " << data_.height << "\n"
+		<< data_.num_levels << "\n";
+  output_stream.write(reinterpret_cast<char*>(&data_.pixels[0]),
+		      static_cast<int>(data_.pixels.size()));
+}
+
 // Parses the body of P3 files that are in text format
-void PpmImage::init_ascii(std::ifstream & input_file) {
+void PpmImage::init_ascii(std::istream & input_file) {
   for ( std::vector<uint8_t>::iterator i = data_.pixels.begin();
         i != data_.pixels.end(); ++i) {
     if ( input_file.bad() ) {
       std::cerr << "bad PPM Body" << std::endl;
       delete this;
-      input_file.close();
       exit(EXIT_FAILURE);
     }
     input_file >> *i;
   }
-  input_file.close();
 }
 
 // Parses the body of P6 files that are in binary format
-void PpmImage::init_byte(std::ifstream & input_file) {
+void PpmImage::init_byte(std::istream & input_file) {
   input_file.read(reinterpret_cast<char*>(&data_.pixels[0]),
                   static_cast<int>(data_.pixels.size()));
   if ( input_file.bad() ) {
     std::cerr << "bad PPM Body" << std::endl;
     delete this;
-    input_file.close();
     exit(EXIT_FAILURE);
   }
-  input_file.close();
 }
 
 // Reads the header and prepares to read body when initializing from stream
-void PpmImage::init(std::ifstream & input_file) {
+void PpmImage::init(std::istream & input_file) {
   input_file >> data_.ppm_version
              >> data_.width
              >> data_.height
@@ -46,7 +50,6 @@ void PpmImage::init(std::ifstream & input_file) {
   if ( input_file.bad() ) {
     std::cerr << "Bad PPM Header" << std::endl;
     delete this;
-    input_file.close();
     exit(EXIT_FAILURE);
   }
 
@@ -59,13 +62,12 @@ void PpmImage::init(std::ifstream & input_file) {
   } else {
     std::cerr << "Bad PPM Header" << std::endl;
     delete this;
-    input_file.close();
     exit(EXIT_FAILURE);
   }
 }
 
 // Read in a PPM image from a file
-PpmImage::PpmImage(std::ifstream & input_file) {
+PpmImage::PpmImage(std::istream & input_file) {
   init(input_file);
 }
 
