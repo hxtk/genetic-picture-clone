@@ -14,23 +14,33 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include <algorithm>
 #include <cstdint>
 #include <iostream>
 #include <fstream>
 
+#include "ppm_image.h"
+
 namespace hxtk {
 namespace graphics {
 struct Point {
-  float x;
-  float y;
+  Point(double h, double v) {
+    x = h;
+    y = v;
+  }
+  double x;
+  double y;
 };
 struct Color {
   uint8_t red;
   uint8_t green;
   uint8_t blue;
-  float  alpha;
 };
 struct Polygon {
+  Polygon(std::vector<Point> p, Color c) {
+    points = p;
+    color = c;
+  }
   std::vector<Point> points;
   Color color;
 };
@@ -41,20 +51,25 @@ class Graphics {
   Graphics(int, int);
   ~Graphics();
 
-  void writePpm(std::string);
+  void render();
+  void savePpm(std::ostream &);
   inline void add_polygon(graphics::Polygon polygon) {
     polygons_.push_back(polygon);
+    rendered_ = false;
   }
 
  private:
   void init(int, int);
-  void render();
   bool pointWithinPolygon(graphics::Point, graphics::Polygon);
   bool rayCrossesEdge(graphics::Point, graphics::Point, graphics::Point);
     
+  constexpr static double kEpsilon = std::numeric_limits<double>::min();
+  constexpr static int kNumLevels = 255;
   std::vector<graphics::Polygon> polygons_;
   std::vector<uint8_t> canvas_;
-  constexpr static float kEpsilon = 0.001F;
+  int width_ = -1;
+  int height_ = -1;
+  bool rendered_ = false;
 };
 }  // namespace hxtk
 
