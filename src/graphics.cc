@@ -21,8 +21,8 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
   }
 
   // Eliminate edge case of vertex and test point at same height
-  if ( abs(ray_origin.y - vertex_a.y) < kEpsilon ||
-       abs(ray_origin.y - vertex_b.y) < kEpsilon ) ray_origin.y += kEpsilon;
+  if (abs(ray_origin.y - vertex_a.y) < kEpsilon ||
+      abs(ray_origin.y - vertex_b.y) < kEpsilon) ray_origin.y += kEpsilon;
 
   // Handle trivial FALSE cases:
   // - test point above or below both verticies
@@ -51,25 +51,25 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
   #endif
 
   return (angle_pax >= angle_bax);
-  
 }
-    
-    // Ray casting algorithm
-    bool Graphics::pointWithinPolygon(graphics::Point point,
-      graphics::Polygon polygon) {
+
+// Ray casting algorithm
+bool Graphics::pointWithinPolygon(graphics::Point point,
+                                  graphics::Polygon polygon) {
     bool response = rayCrossesEdge(point,
-      *polygon.points.begin(),
-				 *polygon.points.end());
-  for ( std::vector<graphics::Point>::iterator i = polygon.points.begin();
+                                   *polygon.points.begin(),
+                                   *polygon.points.end());
+
+    for ( std::vector<graphics::Point>::iterator i = polygon.points.begin();
         (i+1) != polygon.points.end(); ++i) {
     if ( rayCrossesEdge(point, *i, *(i + 1)) ) response ^= true;
   }
 
   #ifdef EBUG
   std::cout << "Point: (" << point.x << ", " << point.y << ") "
-	    << ((response) ? "is" : "is not") << " in polygon." << std::endl;
+            << ((response) ? "is" : "is not") << " in polygon." << std::endl;
   #endif
-  
+
   return response;
 }
 
@@ -86,23 +86,23 @@ void Graphics::render() {
   for (int i = 0; i < height_; ++i) {
     for (int j = 0; j < width_; ++j) {
       graphics::Point pixel {
-	static_cast<double>(j),
-	static_cast<double>(i)
+        static_cast<double>(j),
+        static_cast<double>(i)
       };
       for (std::vector<graphics::Polygon>::iterator it = polygons_.begin();
-	   it != polygons_.end(); ++it) {
-	if ( pointWithinPolygon(pixel, *it) ) {
-	  int index = 3*i*j + 3*i;
-	  canvas_.at(index) =
-	    kNumLevels - canvas_.at(index) > it->color.red ?
-	    canvas_.at(index) + it->color.red : kNumLevels;
-	  canvas_.at(index + 1) =
-	    kNumLevels - canvas_.at(index + 1) > it->color.green ?
-	    canvas_.at(index + 1) + it->color.green : kNumLevels;
-	  canvas_.at(index + 2) =
-	    kNumLevels - canvas_.at(index + 2) > it->color.blue ?
-	    canvas_.at(index + 2) + it->color.blue : kNumLevels;
-	}
+           it != polygons_.end(); ++it) {
+        if (pointWithinPolygon(pixel, *it)) {
+          int index = 3*i*j + 3*i;
+          canvas_.at(index) =
+            kNumLevels - canvas_.at(index) > it->color.red ?
+            canvas_.at(index) + it->color.red : kNumLevels;
+          canvas_.at(index + 1) =
+            kNumLevels - canvas_.at(index + 1) > it->color.green ?
+            canvas_.at(index + 1) + it->color.green : kNumLevels;
+          canvas_.at(index + 2) =
+            kNumLevels - canvas_.at(index + 2) > it->color.blue ?
+            canvas_.at(index + 2) + it->color.blue : kNumLevels;
+        }
       }
     }
   }
@@ -127,7 +127,7 @@ void Graphics::init(int width, int height) {
   width_ = width;
   height_ = height;
 }
-  
+
 Graphics::Graphics(int width, int height) {
   init(width, height);
 }
