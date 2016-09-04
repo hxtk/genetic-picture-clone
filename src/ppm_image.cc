@@ -1,8 +1,7 @@
 /**********
  * PpmImage object definition
  *
- * Copyright: 2016 Peter Sanders
- * Author: Peter Sanders
+ * Copyright: Peter Sanders. All rights reserved.
  * Date: 2016-09-03
  */
 
@@ -10,7 +9,8 @@
 
 namespace hxtk {
 
-void PpmImage::init_ascii(const std::ifstream & input_file) {
+// Parses the body of P3 files that are in text format
+void PpmImage::init_ascii(std::ifstream & input_file) {
   for ( std::vector<uint8_t>::iterator i = data_.pixels.begin();
         i != data_.pixels.end(); ++i) {
     if ( input_file.bad() ) {
@@ -21,23 +21,28 @@ void PpmImage::init_ascii(const std::ifstream & input_file) {
     }
     input_file >> *i;
   }
+  input_file.close();
 }
 
-void PpmImage::init_byte(const std::ifstream & input_file) {
-  input_file.read(data_.pixels, data_pixels.size());
+// Parses the body of P6 files that are in binary format
+void PpmImage::init_byte(std::ifstream & input_file) {
+  input_file.read(reinterpret_cast<char*>(&data_.pixels[0]),
+                  static_cast<int>(data_.pixels.size()));
   if ( input_file.bad() ) {
     std::cerr << "bad PPM Body" << std::endl;
     delete this;
     input_file.close();
     exit(EXIT_FAILURE);
   }
+  input_file.close();
 }
 
-void PpmImage::init(const std::ifstream & input_file) {
+// Reads the header and prepares to read body when initializing from stream
+void PpmImage::init(std::ifstream & input_file) {
   input_file >> data_.ppm_version
              >> data_.width
-             >> height
-             >> num_levels;
+             >> data_.height
+             >> data_.num_levels;
   if ( input_file.bad() ) {
     std::cerr << "Bad PPM Header" << std::endl;
     delete this;
@@ -45,7 +50,8 @@ void PpmImage::init(const std::ifstream & input_file) {
     exit(EXIT_FAILURE);
   }
 
-  data_pixels.resize(3 * data_.width * data_.height);
+  data_.pixels.resize(3 * data_.width * data_.height);
+
   if ( data_.ppm_version.compare("P6") == 0 ) {
     init_byte(input_file);
   } else if ( data_.ppm_version.compare("P3") == 0 ) {
@@ -59,8 +65,12 @@ void PpmImage::init(const std::ifstream & input_file) {
 }
 
 // Read in a PPM image from a file
-explicit PpmImage::PpmImage(const std::ifstream & input_file) {
+PpmImage::PpmImage(std::ifstream & input_file) {
   init(input_file);
+}
+
+PpmImage::~PpmImage() {
+  // TODO(hxtk) deconstructor
 }
 
 }  // namespace hxtk

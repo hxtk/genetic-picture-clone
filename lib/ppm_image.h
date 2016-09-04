@@ -3,8 +3,7 @@
  *
  * Parses PPM Image files in and out of filesystem
  *
- * Copyright: 2016 Peter Sanders
- * Author: Peter Sanders
+ * Copyright: Peter Sanders. All rights reserved.
  * Date: 2016-09-03
  */
 
@@ -21,26 +20,26 @@
 namespace hxtk {
 
 struct PpmData {
-  string ppm_version;
+  std::string ppm_version;
   int width;
   int height;
-  int max;
+  int num_levels;
   std::vector<uint8_t> pixels;
 };
 
 class PpmImage{
  public:
-  explicit PpmImage(const std::ifstream &);
+  explicit PpmImage(std::ifstream &);
   ~PpmImage();
 
-  inline get_width() { return data_.width; }
-  inline get_height() { return data_.height; }
+  inline int get_width() { return data_.width; }
+  inline int get_height() { return data_.height; }
  private:
-  void init(const std::ifstream &);
-  void init_ascii(const std::ifstream &);
-  void init_byte(const std::ifstream &);
+  void init(std::ifstream &);
+  void init_ascii(std::ifstream &);
+  void init_byte(std::ifstream &);
 
-  PpmData data_;  
+  PpmData data_;
 };  // class PpmImage
 }  // namespace hxtk
 

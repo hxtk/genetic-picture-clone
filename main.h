@@ -1,19 +1,17 @@
 /**********
  * Header file for main program
  *
- * Author: Peter Sanders. All rights reserved.
+ * Copyright: Peter Sanders. All rights reserved.
  * Date: 2016-09-03
  */
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef MAIN_H_
+#define MAIN_H_
 
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 
-#include "graphics.h"
-#include "ppm_image.h"
-#include "genome.h"
+#include "lib/ppm_image.h"
 
-#endif // MAIN_H
+#endif  // MAIN_H_

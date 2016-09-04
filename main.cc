@@ -1,21 +1,21 @@
 /**********
  * Main program for genetic picture matcher
  *
- * Author: Peter Sanders. All rights reserved.
+ * Copyright: Peter Sanders. All rights reserved.
  * Date: 2016-09-03
  */
 
-#include "main.h"
+#include "./main.h"
 
-int main(int argc, char ** argv){
-  if(argc != 2){
+int main(int argc, char ** argv) {
+  if (argc != 3) {
     std::cerr << "Usage: " << argv[0]
-	      <<" <input>.ppm <output>.ppm" << std::endl;
-    exit(EXIT_FAILURE)
+              <<" <input>.ppm <output>.ppm" << std::endl;
+    exit(EXIT_FAILURE);
   }
-  std::ifstream input_file(argv[0], std:ifstream::in);
+  std::ifstream input_file(argv[1], std::ifstream::in);
   hxtk::PpmImage *input_image = new hxtk::PpmImage(input_file);
-  
+
   delete input_image;
   return 0;
 }
