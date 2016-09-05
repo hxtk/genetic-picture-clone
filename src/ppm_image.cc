@@ -10,18 +10,18 @@
 namespace hxtk {
 
 void PpmImage::writeByteBody(std::ostream & output_stream) {
-  output_stream.write(reinterpret_cast<const char*>(&(data_.pixels[0])),
-		      data_.pixels.size()*sizeof(uint8_t));
+  output_stream.write(reinterpret_cast<const char*>(&data_.pixels[0]),
+                      data_.pixels.size()*sizeof(uint8_t));
 }
 
 void PpmImage::writeAsciiBody(std::ostream & output_stream) {
-  for(int i = 0; i < data_.pixels.size(); ++i){
+  for (uint i = 0; i < data_.pixels.size(); ++i) {
     output_stream << std::setw(3) << int{data_.pixels.at(i)};
     if (i % 3 == 2) {
       if (i / 3 % data_.width == 0) {
-	output_stream << "\n";
+        output_stream << "\n";
       } else {
-	output_stream << "\t";
+        output_stream << "\t";
       }
     } else {
       output_stream << " ";
@@ -31,11 +31,11 @@ void PpmImage::writeAsciiBody(std::ostream & output_stream) {
 
 void PpmImage::write(std::ostream & output_stream) {
   output_stream << data_.ppm_version << "\n"
-		<< data_.width << " " << data_.height << "\n"
-		<< data_.num_levels << "\n";
+                << data_.width << " " << data_.height << "\n"
+                << data_.num_levels << "\n";
   if ( data_.ppm_version.compare("P6") == 0 ) {
     writeByteBody(output_stream);
-  } else if ( data_.ppm_version.compare("P3") == 0) {
+  } else if ( data_.ppm_version.compare("P3") == 0 ) {
     writeAsciiBody(output_stream);
   } else {
     std::cerr << "Unsupported PPM. File not written." << std::endl;
@@ -43,7 +43,7 @@ void PpmImage::write(std::ostream & output_stream) {
 }
 
 void PpmImage::convert(std::string new_version) {
-  if( new_version.compare("P6") == 0 ||
+  if ( new_version.compare("P6") == 0 ||
       new_version.compare("P3") == 0 ) {
     data_.ppm_version = new_version;
   } else {

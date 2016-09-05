@@ -28,7 +28,7 @@ struct PpmData {
   std::vector<uint8_t> pixels;
 };
 }  // namespace ppm
- 
+
 class PpmImage{
  public:
   explicit PpmImage(std::istream &);
@@ -49,7 +49,6 @@ class PpmImage{
   void init_struct(ppm::PpmData &);
 
   ppm::PpmData data_;
-
 };  // class PpmImage
 }  // namespace hxtk
 
