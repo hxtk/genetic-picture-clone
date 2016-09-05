@@ -17,6 +17,11 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
   if ( vertex_a.y > vertex_b.y )
     return rayCrossesEdge(ray_origin, vertex_b, vertex_a);
 
+  #ifdef EBUG
+  std::cout << "(" << vertex_a.x << ", " << vertex_a.y << ")"
+            << "(" << vertex_b.x << ", " << vertex_b.y << ")" << std::endl;
+  #endif
+  
   // Eliminate edge case of vertex and test point at same height
   if (abs(ray_origin.y - vertex_a.y) < kEpsilon ||
       abs(ray_origin.y - vertex_b.y) < kEpsilon) ray_origin.y += kEpsilon;
@@ -24,7 +29,7 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
   // Handle trivial FALSE cases:
   // - test point above or below both verticies
   // - test point right of both verticies
-  if ( ray_origin.y < vertex_a.y ||
+  if ( ray_origin.y <= vertex_a.y ||
        ray_origin.y > vertex_b.y ||
        ray_origin.x > std::max(vertex_a.x, vertex_b.x) ) {
     #ifdef EBUG
@@ -65,7 +70,7 @@ bool Graphics::pointWithinPolygon(graphics::Point point,
                                   graphics::Polygon polygon) {
   bool response = rayCrossesEdge(point,
                                  *polygon.points.begin(),
-                                 *polygon.points.end());
+                                 polygon.points.end()[-1]);
 
   for ( std::vector<graphics::Point>::iterator i = polygon.points.begin();
         (i+1) != polygon.points.end(); ++i) {
