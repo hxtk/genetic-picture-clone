@@ -15,7 +15,7 @@ void PpmImage::writeByteBody(std::ostream & output_stream) {
 }
 
 void PpmImage::writeAsciiBody(std::ostream & output_stream) {
-  for (int i = 0; i < data_.pixels.size(); ++i) {
+  for (uint i = 0; i < data_.pixels.size(); ++i) {
     output_stream << std::setw(3) << int{data_.pixels.at(i)};
     if (i % 3 == 2) {
       if (i / 3 % data_.width == 0) {
