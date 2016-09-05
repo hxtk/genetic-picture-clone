@@ -64,7 +64,7 @@ class Graphics {
   bool rayCrossesEdge(graphics::Point, graphics::Point, graphics::Point);
 
   constexpr static double kEpsilon = std::numeric_limits<double>::min();
-  constexpr static int kNumLevels = 255;
+  constexpr static uint8_t kNumLevels = 255;
   std::vector<graphics::Polygon> polygons_;
   std::vector<uint8_t> canvas_;
   int width_ = -1;

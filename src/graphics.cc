@@ -14,11 +14,8 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
                               graphics::Point vertex_a,
                               graphics::Point vertex_b) {
   // Enforce A.y <= B.y
-  if ( vertex_a.y > vertex_b.y ) {
-    graphics::Point tmp = vertex_b;
-    vertex_b = vertex_a;
-    vertex_a = tmp;
-  }
+  if ( vertex_a.y > vertex_b.y )
+    return rayCrossesEdge(ray_origin, vertex_b, vertex_a);
 
   // Eliminate edge case of vertex and test point at same height
   if (abs(ray_origin.y - vertex_a.y) < kEpsilon ||
@@ -29,25 +26,35 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
   // - test point right of both verticies
   if ( ray_origin.y < vertex_a.y ||
        ray_origin.y > vertex_b.y ||
-       ray_origin.x > std::max(vertex_a.x, vertex_b.x) ) return false;
+       ray_origin.x > std::max(vertex_a.x, vertex_b.x) ) {
+    #ifdef EBUG
+    std::cout << "Trivial FALSE" << std::endl;
+    #endif
+    return false;
+  }
 
   // Handle trivial TRUE cases:
   // - test point was not trivial FALSE case
   // - test point left of both verticies
-  if ( ray_origin.x < std::min(vertex_a.x, vertex_b.x) ) return true;
+  if ( ray_origin.x < std::min(vertex_a.x, vertex_b.x) ) {
+    #ifdef EBUG
+    std::cout << "Trivial TRUE" << std::endl;
+    #endif
+    return true;
+  }
 
-  // Angle between segment PA and the positive X direction
+  // tangent of angle between segment PA and the positive X direction
   double angle_pax = abs(ray_origin.x - vertex_a.x) >= kEpsilon
                    ? (vertex_a.y - ray_origin.y) / (vertex_a.x - ray_origin.x)
                    : std::numeric_limits<double>::infinity();
 
-  // Angle between BA and the positive X direction
+  // tangent of angle between BA and the positive X direction
   double angle_bax = abs(vertex_b.x - vertex_a.x) >= kEpsilon
                    ? (vertex_a.y - vertex_b.y) / (vertex_a.x - vertex_b.x)
                    : std::numeric_limits<double>::infinity();
 
   #ifdef EBUG
-  std::cout << angle_pax << " > " << angle_bax << std::endl;
+  std::cout << angle_pax << " >= " << angle_bax << std::endl;
   #endif
 
   return (angle_pax >= angle_bax);
@@ -56,19 +63,14 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
 // Ray casting algorithm
 bool Graphics::pointWithinPolygon(graphics::Point point,
                                   graphics::Polygon polygon) {
-    bool response = rayCrossesEdge(point,
-                                   *polygon.points.begin(),
-                                   *polygon.points.end());
+  bool response = rayCrossesEdge(point,
+                                 *polygon.points.begin(),
+                                 *polygon.points.end());
 
-    for ( std::vector<graphics::Point>::iterator i = polygon.points.begin();
+  for ( std::vector<graphics::Point>::iterator i = polygon.points.begin();
         (i+1) != polygon.points.end(); ++i) {
     if ( rayCrossesEdge(point, *i, *(i + 1)) ) response ^= true;
   }
-
-  #ifdef EBUG
-  std::cout << "Point: (" << point.x << ", " << point.y << ") "
-            << ((response) ? "is" : "is not") << " in polygon." << std::endl;
-  #endif
 
   return response;
 }
@@ -83,26 +85,24 @@ void Graphics::render() {
     rendered_ = true;
     return;
   }
-  for (int i = 0; i < height_; ++i) {
-    for (int j = 0; j < width_; ++j) {
-      graphics::Point pixel {
-        static_cast<double>(j),
-        static_cast<double>(i)
-      };
-      for (std::vector<graphics::Polygon>::iterator it = polygons_.begin();
-           it != polygons_.end(); ++it) {
-        if (pointWithinPolygon(pixel, *it)) {
-          int index = 3*i*j + 3*i;
-          canvas_.at(index) =
-            kNumLevels - canvas_.at(index) > it->color.red ?
-            canvas_.at(index) + it->color.red : kNumLevels;
-          canvas_.at(index + 1) =
-            kNumLevels - canvas_.at(index + 1) > it->color.green ?
-            canvas_.at(index + 1) + it->color.green : kNumLevels;
-          canvas_.at(index + 2) =
-            kNumLevels - canvas_.at(index + 2) > it->color.blue ?
-            canvas_.at(index + 2) + it->color.blue : kNumLevels;
-        }
+  for (int i = 0; i < width_*height_; ++i) {
+    graphics::Point p(i % width_, i / width_);
+    for (std::vector<graphics::Polygon>::iterator it = polygons_.begin();
+         it != polygons_.end(); ++it) {
+      if ( pointWithinPolygon(p, *it) ) {
+        #ifdef EBUG
+        std::cout << "(" << p.x << ", " << p.y << ") "
+                  << "within polygon" << std::endl;
+        #endif
+        canvas_.at(3*i) =
+            kNumLevels - canvas_.at(3*i) < it->color.red ? kNumLevels :
+            canvas_.at(3*i) + it->color.red;
+        canvas_.at(3*i + 1) =
+            kNumLevels - canvas_.at(3*i + 1) < it->color.green ? kNumLevels :
+            canvas_.at(3*i + 1) + it->color.green;
+        canvas_.at(3*i + 2) =
+            kNumLevels - canvas_.at(3*i + 2) < it->color.blue ? kNumLevels :
+            canvas_.at(3*i + 2) + it->color.blue;
       }
     }
   }
@@ -112,7 +112,7 @@ void Graphics::render() {
 void Graphics::savePpm(std::ostream & output_stream) {
   if ( !rendered_ ) render();
   ppm::PpmData data = {
-    "P3",
+    "P6",
     width_,
     height_,
     kNumLevels,
