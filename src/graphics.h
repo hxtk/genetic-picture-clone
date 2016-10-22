@@ -19,8 +19,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace hxtk {
-namespace graphics {
+namespace hxtk::graphics {
 struct Point {
   Point(double h, double v) {
     x = h;
@@ -42,29 +41,30 @@ struct Polygon {
   std::vector<Point> points;
   Color color;
 };
-}  // namespace graphics
 
 class Graphics {
  public:
-  Graphics() {};
-  ~Graphics() {};
+  Graphics() {}
+  ~Graphics() {}
+
+  // Set the width and height for the Graphics object
   void Initialize(int, int);
-  void Populate(int, int, std::vector<uint8_t>);
 
   // Accepts a vector<int> which will be erased (if non-empty)
   // and populates it with the monochrome histogram of the image
   // described by the canvas on this class instance.
   //
   // The monochrome histogram is defined here as the number of pixels
-  // containing some lightness value, irrespective of color channel
-  void Histogram(std::vector<int> *);
+  // containing some lightness value, irrespective of color channel.
+  // NOTE: Each pixel has three lightness values (RGB).
+  void Histogram(std::vector<int> *) const;
 
   // Quantifies the difference between two images passed as parameters
   // as a function of both images' probability distribution functions.
   //
   // The probability distribution function are approximated by
   // the monochrome histogram.
-  static double KullbackLeiblerDistance(Graphics &, Graphics &);
+  static double KullbackLeiblerDistance(const Graphics &, const Graphics &);
 
   // Each point is collided with each polygon on the canvas
   // using a ray casting algorithm. If the point is within
@@ -73,13 +73,14 @@ class Graphics {
   // over a black canvas, and are considered to be transparent.
   void Render();
 
-  //void SavePpm(std::ostream &);
-
   // Adds a new polygon to the list of polygons.
   void add_polygon(graphics::Polygon polygon) {
     polygons_.push_back(polygon);
     rendered_ = false;
   }
+  int get_width() const { return width_; }
+  int get_height() const { return height_; }
+
  protected:
   void set_width(int width) {
     width_ = width;
@@ -94,6 +95,7 @@ class Graphics {
     rendered_ = true;
   }
   std::vector<uint8_t>& get_canvas() { return canvas_; }
+
  private:
   constexpr static double kEpsilon = std::numeric_limits<double>::min();
   constexpr static uint8_t kMaxLevel = 255;
@@ -132,7 +134,7 @@ class Graphics {
 
   // Has Render() been called since the last operation?
   bool rendered_ = false;
-};
-}  // namespace hxtk
+};  // class Graphics
+}  // namespace hxtk::graphics
 
 #endif  // LIB_GRAPHICS_H_

@@ -3,7 +3,7 @@
 
 #include "graphics.h"
 
-namespace hxtk {
+namespace hxtk::graphics {
 
 // Ray Casting Algorithm inner calculations
 bool Graphics::RayCrossesEdge(graphics::Point ray_origin,
@@ -109,7 +109,7 @@ void Graphics::Render() {
   rendered_ = true;
 }
 
-void Graphics::Histogram(std::vector<int> * hist) {
+void Graphics::Histogram(std::vector<int> * hist) const {
   hist->resize(kMaxLevel+1);
   std::fill(hist->begin(), hist->end(), 0);
 
@@ -118,35 +118,14 @@ void Graphics::Histogram(std::vector<int> * hist) {
   }
 }
 
-/*
- * TODO(hxtk):
-void Graphics::SavePpm(std::ostream & output_stream) {
-  if ( !rendered_ ) Render();
-  ppm::PpmData data = {
-    "P6",
-    width_,
-    height_,
-    kMaxLevel,
-    canvas_
-  };
-  PpmImage ppm(data);
-  ppm.write(output_stream);
-}
-*/
-
 void Graphics::Initialize(int width, int height) {
   canvas_.resize(3*width*height);
   width_ = width;
   height_ = height;
 }
 
-void Graphics::Populate(int width, int height, std::vector<uint8_t> pixels) {
-  canvas_ = pixels;
-  width_  = width;
-  height_ = height;
-}
-
-double Graphics::KullbackLeiblerDistance(Graphics & p, Graphics & q){
+double Graphics::KullbackLeiblerDistance(
+    const Graphics & p, const Graphics & q) {
   if (p.width_ != q.width_ || p.height_ != q.height_) {
     std::cerr << "Graphics must be the same size" << std::endl;
     return std::numeric_limits<double>::signaling_NaN();
@@ -159,9 +138,9 @@ double Graphics::KullbackLeiblerDistance(Graphics & p, Graphics & q){
   double distance = 0;
   for (uint i = 0; i < hist_p.size(); ++i) {
     if ( hist_p.at(i) != 0 && hist_q.at(i) != 0 ) {
-      distance += hist_p.at(i) * log( hist_p.at(i) / hist_q.at(i) );
+      distance += hist_p.at(i) * log(hist_p.at(i) / hist_q.at(i));
     }
   }
   return distance;
 }
-}  // namespace hxtk
+}  // namespace hxtk::graphics

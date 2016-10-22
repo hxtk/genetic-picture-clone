@@ -1,11 +1,5 @@
-/**********
- * Header file for PpmImage object.
- *
- * Parses PPM Image files in and out of filesystem
- *
- * Copyright: Peter Sanders. All rights reserved.
- * Date: 2016-09-03
- */
+// Copyright: Peter Sanders. All rights reserved.
+// Date: 2016-10-21
 
 #ifndef LIB_PPM_IMAGE_H_
 #define LIB_PPM_IMAGE_H_
@@ -20,38 +14,26 @@
 
 #include "./graphics.h"
 
-namespace hxtk {
-namespace ppm {
-struct PpmData {
-  std::string ppm_version;
-  int width;
-  int height;
-  int num_levels;
-  std::vector<uint8_t> pixels;
-};
-}  // namespace ppm
-
-class PpmImage{
+namespace hxtk::graphics {
+class PpmImage : public Graphics {
  public:
-  explicit PpmImage(std::istream &);
-  explicit PpmImage(ppm::PpmData &);
-  ~PpmImage();
+  PpmImage() {}
+  ~PpmImage() {};
 
-  void write(std::ostream &);
-  void convert(std::string);
+  bool StreamInitialize(std::istream &);
 
-  inline int get_width() { return data_.width; }
-  inline int get_height() { return data_.height; }
+  void Save(std::ostream &);
+  void Convert(std::string);
  private:
+  bool ReadAsciiStream(std::istream &);
+  bool ReadByteStream(std::istream &);
+
   void writeByteBody(std::ostream &);
   void writeAsciiBody(std::ostream &);
-  void init_stream(std::istream &);
-  void init_ascii_stream(std::istream &);
-  void init_byte_stream(std::istream &);
-  void init_struct(ppm::PpmData &);
 
-  ppm::PpmData data_;
+  std::string ppm_version_;
+  int num_levels_;
 };  // class PpmImage
-}  // namespace hxtk
+}  // namespace hxtk::graphics
 
 #endif  // LIB_PPM_IMAGE_H_

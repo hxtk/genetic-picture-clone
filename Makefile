@@ -1,7 +1,7 @@
 CPP := g++
 CPPFLAGS :=-O3 -std=c++11 -Wall -Wextra #-DEBUG
 OBJ = obj
-LIB = lib
+SRC = src
 BUILD = build
 
 DEPS = $(OBJ)/main.o $(OBJ)/ppm_image.o $(OBJ)/graphics.o

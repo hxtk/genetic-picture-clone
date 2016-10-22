@@ -7,10 +7,10 @@
 
 #include "./main.h"
 
-hxtk::Graphics * target;
+hxtk::graphics::Graphics * target;
 
-double fitness_function(hxtk::Graphics & g){
-  return hxtk::Graphics::KullbackLeiblerDistance(*target, g);
+double fitness_function(hxtk::graphics::Graphics & g){
+  return hxtk::graphics::Graphics::KullbackLeiblerDistance(*target, g);
 }
 
 int main(int argc, char ** argv) {
@@ -20,12 +20,14 @@ int main(int argc, char ** argv) {
     exit(EXIT_FAILURE);
   }
   std::ifstream input_file(argv[1], std::ios::in | std::ios::binary);
-  hxtk::PpmImage *input_image = new hxtk::PpmImage(input_file);
+  hxtk::graphics::PpmImage input_image;
+  if (!input_image.StreamInitialize(input_file)) {
+    std::cerr << "Input Image failed to initialize. Terminating." << std::endl;
+    exit(EXIT_FAILURE);
+  }
   input_file.close();
 
-  target = input_image->ToGraphics();
-  delete input_image;
+  target = static_cast<hxtk::graphics::Graphics*>(&input_image);
 
-  delete target;
   return 0;
 }
