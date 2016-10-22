@@ -17,10 +17,10 @@ $(BUILD)/match: $(DEPS)
 $(OBJ)/main.o: main.h main.cc
 	$(CPP) $(CPPFLAGS) -o $@ -c main.cc
 
-$(OBJ)/ppm_image.o: $(LIB)/ppm_image.h
+$(OBJ)/ppm_image.o: $(SRC)/ppm_image.h $(SRC)/graphics.h
 	$(CPP) $(CPPFLAGS) -o $@ -c src/ppm_image.cc
 
-$(OBJ)/graphics.o: $(LIB)/graphics.h $(OBJ)/ppm_image.o
+$(OBJ)/graphics.o: $(SRC)/graphics.h
 	$(CPP) $(CPPFLAGS) -o $@ -c src/graphics.cc
 
 .PHONY: clean all debug

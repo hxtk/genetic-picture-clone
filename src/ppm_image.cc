@@ -10,8 +10,8 @@
 namespace hxtk {
 
 void PpmImage::writeByteBody(std::ostream & output_stream) {
-  output_stream.write(reinterpret_cast<const char*>(&data_.pixels[0]),
-                      data_.pixels.size()*sizeof(uint8_t));
+  output_stream.write(reinterpret_cast<const char *>(data_.pixels.data()),
+      data_.pixels.size()*sizeof(uint8_t));
 }
 
 void PpmImage::writeAsciiBody(std::ostream & output_stream) {

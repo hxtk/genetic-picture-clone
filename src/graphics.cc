@@ -10,12 +10,12 @@
 namespace hxtk {
 
 // Ray Casting Algorithm inner calculations
-bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
+bool Graphics::RayCrossesEdge(graphics::Point ray_origin,
                               graphics::Point vertex_a,
                               graphics::Point vertex_b) {
   // Enforce A.y <= B.y
   if ( vertex_a.y > vertex_b.y )
-    return rayCrossesEdge(ray_origin, vertex_b, vertex_a);
+    return RayCrossesEdge(ray_origin, vertex_b, vertex_a);
 
   #ifdef EBUG
   std::cout << "(" << vertex_a.x << ", " << vertex_a.y << ")"
@@ -31,7 +31,7 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
   // - test point right of both verticies
   if ( ray_origin.y <= vertex_a.y ||
        ray_origin.y > vertex_b.y ||
-       ray_origin.x > std::max(vertex_a.x, vertex_b.x) ) {
+       ray_origin.x >= std::max(vertex_a.x, vertex_b.x) ) {
     #ifdef EBUG
     std::cout << "Trivial FALSE" << std::endl;
     #endif
@@ -41,7 +41,7 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
   // Handle trivial TRUE cases:
   // - test point was not trivial FALSE case
   // - test point left of both verticies
-  if ( ray_origin.x < std::min(vertex_a.x, vertex_b.x) ) {
+  if ( ray_origin.x <= std::min(vertex_a.x, vertex_b.x) ) {
     #ifdef EBUG
     std::cout << "Trivial TRUE" << std::endl;
     #endif
@@ -66,22 +66,22 @@ bool Graphics::rayCrossesEdge(graphics::Point ray_origin,
 }
 
 // Ray casting algorithm
-bool Graphics::pointWithinPolygon(graphics::Point point,
+bool Graphics::PointWithinPolygon(graphics::Point point,
                                   graphics::Polygon polygon) {
-  bool response = rayCrossesEdge(point,
-                                 *polygon.points.begin(),
-                                 polygon.points.end()[-1]);
+  bool response = this->RayCrossesEdge(point,
+      *polygon.points.begin(),
+       polygon.points.end()[-1]);
 
   for ( std::vector<graphics::Point>::iterator i = polygon.points.begin();
         (i+1) != polygon.points.end(); ++i) {
-    if ( rayCrossesEdge(point, *i, *(i + 1)) ) response ^= true;
+    if ( RayCrossesEdge(point, *i, *(i + 1)) ) response ^= true;
   }
 
   return response;
 }
 
 // For each pixel, see which polygons it is in and combine colors additively
-void Graphics::render() {
+void Graphics::Render() {
   std::fill(canvas_.begin(), canvas_.end(), 0);
   if ( polygons_.empty() ) {
     #ifdef EBUG
@@ -94,7 +94,7 @@ void Graphics::render() {
     graphics::Point p(i % width_, i / width_);
     for (std::vector<graphics::Polygon>::iterator it = polygons_.begin();
          it != polygons_.end(); ++it) {
-      if ( pointWithinPolygon(p, *it) ) {
+      if ( this->PointWithinPolygon(p, *it) ) {
         #ifdef EBUG
         std::cout << "(" << p.x << ", " << p.y << ") "
                   << "within polygon" << std::endl;
@@ -114,8 +114,18 @@ void Graphics::render() {
   rendered_ = true;
 }
 
-void Graphics::savePpm(std::ostream & output_stream) {
-  if ( !rendered_ ) render();
+void Graphics::Histogram(std::vector<int> * hist) {
+  hist->resize(256);
+  std::fill(hist->begin(), hist->end(), 0);
+
+  for (std::vector<uint8_t>::iterator it = canvas_.begin();
+       it != canvas_.end(); ++it) {
+    ++(hist->at(*it));
+  }
+}
+
+void Graphics::SavePpm(std::ostream & output_stream) {
+  if ( !rendered_ ) Render();
   ppm::PpmData data = {
     "P6",
     width_,
@@ -133,11 +143,39 @@ void Graphics::init(int width, int height) {
   height_ = height;
 }
 
+void Graphics::init(int width, int height, std::vector<uint8_t> pixels) {
+  canvas_ = pixels;
+  width_  = width;
+  height_ = height;
+}
+
 Graphics::Graphics(int width, int height) {
   init(width, height);
+}
+
+Graphics::Graphics(int width, int height, std::vector<uint8_t> pixels) {
+  init(width, height, pixels);
 }
 
 Graphics::~Graphics() {
 }
 
+double Graphics::KullbackLeiblerDistance(Graphics & p, Graphics & q){
+  if (p.width_ != q.width_ || p.height_ != q.height_) {
+    std::cerr << "Graphics must be the same size" << std::endl;
+    return std::numeric_limits<double>::signaling_NaN();
+  }
+  std::vector<int> hist_p = {};
+  p.Histogram(&hist_p);
+  std::vector<int> hist_q = {};
+  q.Histogram(&hist_q);
+  
+  double distance = 0;
+  for (uint i = 0; i < hist_p.size(); ++i) {
+    if ( hist_p.at(i) != 0 && hist_q.at(i) != 0 ) {
+      distance += hist_p.at(i) * log( hist_p.at(i) / hist_q.at(i) );
+    }
+  }
+  return distance;
+}
 }  // namespace hxtk

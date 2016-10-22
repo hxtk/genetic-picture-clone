@@ -18,6 +18,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include "./graphics.h"
+
 namespace hxtk {
 namespace ppm {
 struct PpmData {

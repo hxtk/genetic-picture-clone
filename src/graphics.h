@@ -49,22 +49,27 @@ struct Polygon {
 class Graphics {
  public:
   Graphics(int, int);
+  Graphics(int, int, std::vector<uint8_t>);
   ~Graphics();
 
-  void render();
-  void savePpm(std::ostream &);
+  void Histogram(std::vector<int> *);
+  static double KullbackLeiblerDistance(Graphics &, Graphics &);
+
+  void Render();
+  void SavePpm(std::ostream &);
   inline void add_polygon(graphics::Polygon polygon) {
     polygons_.push_back(polygon);
     rendered_ = false;
   }
-
  private:
-  void init(int, int);
-  bool pointWithinPolygon(graphics::Point, graphics::Polygon);
-  bool rayCrossesEdge(graphics::Point, graphics::Point, graphics::Point);
-
   constexpr static double kEpsilon = std::numeric_limits<double>::min();
   constexpr static uint8_t kNumLevels = 255;
+
+  void init(int, int);
+  void init(int, int, std::vector<uint8_t>);
+  bool PointWithinPolygon(graphics::Point, graphics::Polygon);
+  bool RayCrossesEdge(graphics::Point, graphics::Point, graphics::Point);
+
   std::vector<graphics::Polygon> polygons_;
   std::vector<uint8_t> canvas_;
   int width_ = -1;
