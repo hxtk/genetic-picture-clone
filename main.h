@@ -12,7 +12,7 @@
 #include <fstream>
 #include <cstdlib>
 
-#include "lib/ppm_image.h"
-#include "lib/graphics.h"
+#include "src/ppm_image.h"
+#include "src/graphics.h"
 
 #endif  // MAIN_H_

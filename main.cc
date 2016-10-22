@@ -7,26 +7,32 @@
 
 #include "./main.h"
 
-int main(int argc, char ** argv) {
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0]
-              <<" <output>.ppm" << std::endl;
-    exit(EXIT_FAILURE);
+hxtk::graphics::Graphics * target = nullptr;
+
+double fitness_function(hxtk::graphics::Graphics & g){
+  return hxtk::graphics::Graphics::KullbackLeiblerDistance(*target, g);
+}
+
+int main(int argc, char* argv[]) {
+  hxtk::graphics::PpmImage g;
+  g.Initialize(250,250);
+  std::vector<hxtk::graphics::Point> points;
+  double pi = acos(-1.0);
+  for (double t = 0.0; t < 2*pi; t += 0.01) {
+    points.push_back(
+        hxtk::graphics::Point(125+100*cos(t), 125+100*sin(t)));
   }
-  hxtk::Graphics * g = new hxtk::Graphics(512,512);
-  g->add_polygon({
-       { {100,100}, {100,300}, {300,300}, {300, 100} },
-       { 100, 100, 255 }
-     });
-  g->add_polygon({
-       { {200, 200}, {200, 500}, {500, 500} },
-       { 255, 100, 100 }
-     });
-  std::ofstream output_file(argv[1], std::ios::out | std::ios::binary);
-  g->savePpm(output_file);
+  hxtk::graphics::Color red(255,100,100);
+  g.add_polygon(hxtk::graphics::Polygon(points, red));
+
+  std::ofstream output_file(
+      "test.ppm", std::ofstream::out | std::ofstream::binary);
+
+  g.Render();
+  g.Save(output_file);
   output_file.close();
 
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 /*
@@ -37,10 +43,15 @@ int main(int argc, char ** argv) {
     exit(EXIT_FAILURE);
   }
   std::ifstream input_file(argv[1], std::ios::in | std::ios::binary);
-  hxtk::PpmImage *input_image = new hxtk::PpmImage(input_file);
+  hxtk::graphics::PpmImage input_image;
+  if (!input_image.StreamInitialize(input_file)) {
+    std::cerr << "Input Image failed to initialize. Terminating." << std::endl;
+    exit(EXIT_FAILURE);
+  }
   input_file.close();
 
-  delete input_image;
+  target = static_cast<hxtk::graphics::Graphics*>(&input_image);
+
   return 0;
 }
 */
