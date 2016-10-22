@@ -1,11 +1,7 @@
-/**********
- * Graphics object definition
- *
- * Copyright: Peter Sanders. All rights reserved.
- * Date: 2016-09-04
- */
+// Copyright: Peter Sanders. All rights reserved.
+// Date: 2016-10-21
 
-#include "../lib/graphics.h"
+#include "graphics.h"
 
 namespace hxtk {
 
@@ -21,7 +17,7 @@ bool Graphics::RayCrossesEdge(graphics::Point ray_origin,
   std::cout << "(" << vertex_a.x << ", " << vertex_a.y << ")"
             << "(" << vertex_b.x << ", " << vertex_b.y << ")" << std::endl;
   #endif
-  
+
   // Eliminate edge case of vertex and test point at same height
   if (abs(ray_origin.y - vertex_a.y) < kEpsilon ||
       abs(ray_origin.y - vertex_b.y) < kEpsilon) ray_origin.y += kEpsilon;
@@ -72,8 +68,7 @@ bool Graphics::PointWithinPolygon(graphics::Point point,
       *polygon.points.begin(),
        polygon.points.end()[-1]);
 
-  for ( std::vector<graphics::Point>::iterator i = polygon.points.begin();
-        (i+1) != polygon.points.end(); ++i) {
+  for (auto i = polygon.points.begin(); (i+1) != polygon.points.end(); ++i) {
     if ( RayCrossesEdge(point, *i, *(i + 1)) ) response ^= true;
   }
 
@@ -92,21 +87,20 @@ void Graphics::Render() {
   }
   for (int i = 0; i < width_*height_; ++i) {
     graphics::Point p(i % width_, i / width_);
-    for (std::vector<graphics::Polygon>::iterator it = polygons_.begin();
-         it != polygons_.end(); ++it) {
-      if ( this->PointWithinPolygon(p, *it) ) {
+    for (auto it = polygons_.begin(); it != polygons_.end(); ++it) {
+      if (this->PointWithinPolygon(p, *it)) {
         #ifdef EBUG
         std::cout << "(" << p.x << ", " << p.y << ") "
                   << "within polygon" << std::endl;
         #endif
         canvas_.at(3*i) =
-            kNumLevels - canvas_.at(3*i) < it->color.red ? kNumLevels :
+            kMaxLevel - canvas_.at(3*i) < it->color.red ? kMaxLevel :
             canvas_.at(3*i) + it->color.red;
         canvas_.at(3*i + 1) =
-            kNumLevels - canvas_.at(3*i + 1) < it->color.green ? kNumLevels :
+            kMaxLevel - canvas_.at(3*i + 1) < it->color.green ? kMaxLevel :
             canvas_.at(3*i + 1) + it->color.green;
         canvas_.at(3*i + 2) =
-            kNumLevels - canvas_.at(3*i + 2) < it->color.blue ? kNumLevels :
+            kMaxLevel - canvas_.at(3*i + 2) < it->color.blue ? kMaxLevel :
             canvas_.at(3*i + 2) + it->color.blue;
       }
     }
@@ -115,49 +109,39 @@ void Graphics::Render() {
 }
 
 void Graphics::Histogram(std::vector<int> * hist) {
-  hist->resize(256);
+  hist->resize(kMaxLevel+1);
   std::fill(hist->begin(), hist->end(), 0);
 
-  for (std::vector<uint8_t>::iterator it = canvas_.begin();
-       it != canvas_.end(); ++it) {
+  for (auto it = canvas_.begin(); it != canvas_.end(); ++it) {
     ++(hist->at(*it));
   }
 }
 
+/*
 void Graphics::SavePpm(std::ostream & output_stream) {
   if ( !rendered_ ) Render();
   ppm::PpmData data = {
     "P6",
     width_,
     height_,
-    kNumLevels,
+    kMaxLevel,
     canvas_
   };
   PpmImage ppm(data);
   ppm.write(output_stream);
 }
+*/
 
-void Graphics::init(int width, int height) {
+void Graphics::Initialize(int width, int height) {
   canvas_.resize(3*width*height);
   width_ = width;
   height_ = height;
 }
 
-void Graphics::init(int width, int height, std::vector<uint8_t> pixels) {
+void Graphics::Populate(int width, int height, std::vector<uint8_t> pixels) {
   canvas_ = pixels;
   width_  = width;
   height_ = height;
-}
-
-Graphics::Graphics(int width, int height) {
-  init(width, height);
-}
-
-Graphics::Graphics(int width, int height, std::vector<uint8_t> pixels) {
-  init(width, height, pixels);
-}
-
-Graphics::~Graphics() {
 }
 
 double Graphics::KullbackLeiblerDistance(Graphics & p, Graphics & q){
@@ -169,7 +153,7 @@ double Graphics::KullbackLeiblerDistance(Graphics & p, Graphics & q){
   p.Histogram(&hist_p);
   std::vector<int> hist_q = {};
   q.Histogram(&hist_q);
-  
+
   double distance = 0;
   for (uint i = 0; i < hist_p.size(); ++i) {
     if ( hist_p.at(i) != 0 && hist_q.at(i) != 0 ) {

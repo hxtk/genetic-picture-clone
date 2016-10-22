@@ -48,26 +48,66 @@ struct Polygon {
 
 class Graphics {
  public:
-  Graphics(int, int);
-  Graphics(int, int, std::vector<uint8_t>);
-  ~Graphics();
+  Graphics() {};
+  ~Graphics() {};
+  void Initialize(int, int);
+  void Populate(int, int, std::vector<uint8_t>);
 
+  // Accepts a vector<int> which will be erased (if non-empty)
+  // and populates it with the monochrome histogram of the image
+  // described by the canvas on this class instance.
+  //
+  // The monochrome histogram is defined here as the number of pixels
+  // containing some lightness value, irrespective of color channel
   void Histogram(std::vector<int> *);
+
+  // Quantifies the difference between two images passed as parameters
+  // as a function of both images' probability distribution functions.
+  //
+  // The probability distribution function are approximated by
+  // the monochrome histogram.
   static double KullbackLeiblerDistance(Graphics &, Graphics &);
 
+  // Each point is collided with each polygon on the canvas
+  // using a ray casting algorithm. If the point is within
+  // the polygon, the color of that polygon is added to the color
+  // of the pixel. Polygons here are treated as light sources
+  // over a black canvas, and are considered to be transparent.
   void Render();
-  void SavePpm(std::ostream &);
-  inline void add_polygon(graphics::Polygon polygon) {
+
+  //void SavePpm(std::ostream &);
+
+  // Adds a new polygon to the list of polygons.
+  void add_polygon(graphics::Polygon polygon) {
     polygons_.push_back(polygon);
     rendered_ = false;
   }
  private:
   constexpr static double kEpsilon = std::numeric_limits<double>::min();
-  constexpr static uint8_t kNumLevels = 255;
+  constexpr static uint8_t kMaxLevel = 255;
 
-  void init(int, int);
-  void init(int, int, std::vector<uint8_t>);
+  // Ray Casting Algorithm:
+  // Begin at the point in question and iterate right.
+  // Each time the ray crosses an edge of the polygon,
+  //    it is either entering or leaving the polygon
+  // At infinity, the ray cannot be inside the polygon.
+  // Thus, there are an odd number of edge crossings
+  //     IFF the point is within the polygon.
   bool PointWithinPolygon(graphics::Point, graphics::Polygon);
+
+  // Accepts a point as the starting point for the ray
+  // and two vertices as the end-points for the edge
+  //
+  // Trivially:
+  // A horizontal ray does not ross an edge if the starting point is
+  //     above, below, or beyond both edge vertices.
+  // It does cross the edge if it does not meet those criteria
+  //     and is left of both vertices.
+  //
+  // Non-trivially:
+  // The point crosses the edge IFF the angle it formed between it
+  //    and the horizontal through the bottom-most vertex is wider
+  //    than that formed between the top-most vertex and the horizontal.
   bool RayCrossesEdge(graphics::Point, graphics::Point, graphics::Point);
 
   std::vector<graphics::Polygon> polygons_;
