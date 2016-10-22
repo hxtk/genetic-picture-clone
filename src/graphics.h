@@ -19,8 +19,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "./ppm_image.h"
-
 namespace hxtk {
 namespace graphics {
 struct Point {
@@ -82,6 +80,20 @@ class Graphics {
     polygons_.push_back(polygon);
     rendered_ = false;
   }
+ protected:
+  void set_width(int width) {
+    width_ = width;
+    rendered_ = false;
+  }
+  void set_height(int height) {
+    height_ = height;
+    rendered_ = false;
+  }
+  void set_canvas(const std::vector<uint8_t>& canvas) {
+    canvas_ = canvas;
+    rendered_ = true;
+  }
+  std::vector<uint8_t>& get_canvas() { return canvas_; }
  private:
   constexpr static double kEpsilon = std::numeric_limits<double>::min();
   constexpr static uint8_t kMaxLevel = 255;
@@ -110,10 +122,15 @@ class Graphics {
   //    than that formed between the top-most vertex and the horizontal.
   bool RayCrossesEdge(graphics::Point, graphics::Point, graphics::Point);
 
+  // List of polygons to be rendered
   std::vector<graphics::Polygon> polygons_;
+
+  // Byte array of pixels
   std::vector<uint8_t> canvas_;
   int width_ = -1;
   int height_ = -1;
+
+  // Has Render() been called since the last operation?
   bool rendered_ = false;
 };
 }  // namespace hxtk

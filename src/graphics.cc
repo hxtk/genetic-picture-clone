@@ -77,6 +77,7 @@ bool Graphics::PointWithinPolygon(graphics::Point point,
 
 // For each pixel, see which polygons it is in and combine colors additively
 void Graphics::Render() {
+  canvas_.resize(3*width_*height_);
   std::fill(canvas_.begin(), canvas_.end(), 0);
   if ( polygons_.empty() ) {
     #ifdef EBUG
@@ -118,6 +119,7 @@ void Graphics::Histogram(std::vector<int> * hist) {
 }
 
 /*
+ * TODO(hxtk):
 void Graphics::SavePpm(std::ostream & output_stream) {
   if ( !rendered_ ) Render();
   ppm::PpmData data = {
