@@ -9,13 +9,13 @@
 
 namespace hxtk::graphics {
 
-void PpmImage::writeByteBody(std::ostream & output_stream) {
+void PpmImage::WriteByteBody(std::ostream & output_stream) {
   output_stream.write(reinterpret_cast<const char *>(get_canvas().data()),
       get_canvas().size()*sizeof(uint8_t));
 }
 
-void PpmImage::writeAsciiBody(std::ostream & output_stream) {
-  for (uint i = 0; i < get_canvas().size(); ++i) {
+void PpmImage::WriteAsciiBody(std::ostream & output_stream) {
+  for (int i = 0; i < get_canvas().size(); ++i) {
     output_stream << std::setw(4) << int{get_canvas().at(i)};
     if (i % 3 == 2) {
       if (i / 3 % get_width() == 0) {
@@ -34,17 +34,16 @@ void PpmImage::Save(std::ostream & output_stream) {
                 << get_width() << " " << get_height() << "\n"
                 << num_levels_ << "\n";
   if (ppm_version_ == "P6") {
-    writeByteBody(output_stream);
+    WriteByteBody(output_stream);
   } else if (ppm_version_ == "P3") {
-    writeAsciiBody(output_stream);
+    WriteAsciiBody(output_stream);
   } else {
     std::cerr << "Unsupported PPM. File not written." << std::endl;
   }
 }
 
 void PpmImage::Convert(std::string new_version) {
-  if ( new_version.compare("P6") == 0 ||
-      new_version.compare("P3") == 0 ) {
+  if (new_version == "P6" || new_version == "P3") {
     ppm_version_ = new_version;
   } else {
     std::cerr << "invalid PPM version" << std::endl;

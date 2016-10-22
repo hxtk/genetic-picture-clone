@@ -7,12 +7,35 @@
 
 #include "./main.h"
 
-hxtk::graphics::Graphics * target;
+hxtk::graphics::Graphics * target = nullptr;
 
 double fitness_function(hxtk::graphics::Graphics & g){
   return hxtk::graphics::Graphics::KullbackLeiblerDistance(*target, g);
 }
 
+int main(int argc, char* argv[]) {
+  hxtk::graphics::PpmImage g;
+  g.Initialize(250,250);
+  std::vector<hxtk::graphics::Point> points;
+  double pi = acos(-1.0);
+  for (double t = 0.0; t < 2*pi; t += 0.01) {
+    points.push_back(
+        hxtk::graphics::Point(125+100*cos(t), 125+100*sin(t)));
+  }
+  hxtk::graphics::Color red(255,100,100);
+  g.add_polygon(hxtk::graphics::Polygon(points, red));
+
+  std::ofstream output_file(
+      "test.ppm", std::ofstream::out | std::ofstream::binary);
+
+  g.Render();
+  g.Save(output_file);
+  output_file.close();
+
+  return 0;
+}
+
+/*
 int main(int argc, char ** argv) {
   if (argc != 3) {
     std::cerr << "Usage: " << argv[0]
@@ -31,3 +54,4 @@ int main(int argc, char ** argv) {
 
   return 0;
 }
+*/

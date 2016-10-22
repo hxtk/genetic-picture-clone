@@ -29,6 +29,12 @@ struct Point {
   double y;
 };
 struct Color {
+  Color(){}
+  Color(uint8_t r, uint8_t g, uint8_t b) {
+    red = r;
+    green = g;
+    blue = b;
+  }
   uint8_t red;
   uint8_t green;
   uint8_t blue;
@@ -127,8 +133,8 @@ class Graphics {
   // List of polygons to be rendered
   std::vector<graphics::Polygon> polygons_;
 
-  // Byte array of pixels
-  std::vector<uint8_t> canvas_;
+  // Byte array of 24-bit RGB pixels
+  std::vector<uint8_t> canvas_ = {};
   int width_ = -1;
   int height_ = -1;
 
