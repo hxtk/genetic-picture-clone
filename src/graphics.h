@@ -1,11 +1,7 @@
-/**********
- * Header file for Graphics class
- *
- * Renders 2d graphics from polygon definitions.
- *
- * Copyright: Peter Sanders. All rights reserved.
- * Date: 2016-09-04
- */
+// Header file for 2d Graphics class.
+//
+// Copyright: Peter Sanders. All rights reserved.
+// Date: 2016-10-23
 
 #ifndef LIB_GRAPHICS_H_
 #define LIB_GRAPHICS_H_
