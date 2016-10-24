@@ -62,20 +62,24 @@ bool Graphics::RayCrossesEdge(graphics::Point ray_origin,
 }
 
 // Ray casting algorithm
-bool Graphics::PointWithinPolygon(graphics::Point point,
-                                  graphics::Polygon polygon) {
-  bool response = this->RayCrossesEdge(point,
-      *polygon.points.begin(),
-       polygon.points.end()[-1]);
+bool Graphics::PointWithinPolygon(Point point, Polygon polygon) {
+  // Use edge case to initialize return value.
+  bool response = this->RayCrossesEdge(
+      point,
+      polygon.points.front(),
+      polygon.points.back());
 
-  for (auto i = polygon.points.begin(); (i+1) != polygon.points.end(); ++i) {
-    if ( RayCrossesEdge(point, *i, *(i + 1)) ) response ^= true;
+  // NOTE: iterates to |end - 1|
+  for (auto it = polygon.points.begin();
+       (i+1) != polygon.points.end(); ++i) {
+    // Toggle return value for each edge crossed
+    response ^= this->RayCrossesEdge(point, *i, *(i+1));
   }
 
   return response;
 }
 
-// For each pixel, see which polygons it is in and combine colors additively
+// For each pixel, find which polygons it is in and combine colors additively
 void Graphics::Render() {
   canvas_.resize(3*width_*height_);
   std::fill(canvas_.begin(), canvas_.end(), 0);
@@ -109,7 +113,7 @@ void Graphics::Render() {
   rendered_ = true;
 }
 
-void Graphics::Histogram(std::vector<int> * hist) const {
+void Graphics::Histogram(std::vector<int>* hist) const {
   hist->resize(kMaxLevel+1);
   std::fill(hist->begin(), hist->end(), 0);
 
@@ -136,7 +140,7 @@ double Graphics::KullbackLeiblerDistance(
   q.Histogram(&hist_q);
 
   double distance = 0;
-  for (uint i = 0; i < hist_p.size(); ++i) {
+  for (int i = 0; i < hist_p.size(); ++i) {
     if ( hist_p.at(i) != 0 && hist_q.at(i) != 0 ) {
       distance += hist_p.at(i) * log(hist_p.at(i) / hist_q.at(i));
     }

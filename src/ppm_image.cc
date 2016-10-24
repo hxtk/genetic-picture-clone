@@ -9,12 +9,12 @@
 
 namespace hxtk::graphics {
 
-void PpmImage::WriteByteBody(std::ostream & output_stream) {
+void PpmImage::WriteByteBody(std::ostream& output_stream) {
   output_stream.write(reinterpret_cast<const char *>(get_canvas().data()),
       get_canvas().size()*sizeof(uint8_t));
 }
 
-void PpmImage::WriteAsciiBody(std::ostream & output_stream) {
+void PpmImage::WriteAsciiBody(std::ostream& output_stream) {
   for (int i = 0; i < get_canvas().size(); ++i) {
     output_stream << std::setw(4) << int{get_canvas().at(i)};
     if (i % 3 == 2) {
@@ -29,7 +29,7 @@ void PpmImage::WriteAsciiBody(std::ostream & output_stream) {
   }
 }
 
-void PpmImage::Save(std::ostream & output_stream) {
+void PpmImage::Save(std::ostream& output_stream) {
   output_stream << ppm_version_ << "\n"
                 << get_width() << " " << get_height() << "\n"
                 << num_levels_ << "\n";
